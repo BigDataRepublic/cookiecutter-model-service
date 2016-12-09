@@ -24,13 +24,14 @@ import scala.util.{Failure, Success, Try}
 /**
   * Embedded kafka connect standalone.
   */
-class EmbeddedKafkaConnect(props: Map[String, String], connectorProps: List[Map[String,String]], saveState: Boolean) extends EmbeddedService with LazyLogging {
+class EmbeddedKafkaConnect(props: Map[String, String], connectorProps: List[Map[String,String]], clearState: Boolean) extends EmbeddedService with LazyLogging {
 
 
   val config = new StandaloneConfig(props.asJava)
   val worker = new Worker(config, new MemoryOffsetBackingStore)
+  val restServer = new RestServer(config)
   val herder = new StandaloneHerder(worker)
-  val connect = new Connect(worker, herder, new RestServer(config))
+  val connect = new Connect(worker, herder, restServer)
 
   implicit class JavaPromiseFuture[T](p: Promise[T]) {
     def asJava: FutureCallback[T] =
@@ -45,6 +46,17 @@ class EmbeddedKafkaConnect(props: Map[String, String], connectorProps: List[Map[
   }
 
     def start(): Unit = {
+      if (clearState) {
+        logger.info("Cleaning Kafka Connect storage dir before start...")
+        Try {
+          FileUtils.cleanDirectory(new File(props("offset.storage.file.filename")).getParentFile)
+        } match {
+          case Success(_) => logger.info("Successfully cleaned Kafka Connect data dir.")
+          case Failure(e) => logger.error("Failed to clean Kafka Connect data dir.")
+        }
+      }
+      connect.start()
+
 
       // Add all connectors in parallel.
       val futures = connectorProps.map { prop =>
@@ -65,29 +77,24 @@ class EmbeddedKafkaConnect(props: Map[String, String], connectorProps: List[Map[
 //        case _ => connect.stop()
 //      }
 
+
       Await.ready(future, Duration.Inf)
       connect.start()
+
       logger.info("Successfully started Kafka Connect")
     }
 
   def stop(): Unit = {
     connect.stop()
-    if (saveState) return
-    Try {
-      FileUtils.cleanDirectory(new File(props("offset.storage.file.filename")).getParentFile)
-    } match {
-      case Success(_) => logger.info("Successfully cleaned Kafka Connect data dir.")
-      case Failure(e) => logger.error("Failed to clean Kafka Connect data dir.")
-    }
   }
 
 }
 
 object EmbeddedKafkaConnect {
-  def apply(props: Map[String, String], connectorProps: List[Map[String, String]], saveState: Boolean): EmbeddedKafkaConnect = new EmbeddedKafkaConnect(props, connectorProps, saveState)
+  def apply(props: Map[String, String], connectorProps: List[Map[String, String]], clearState: Boolean): EmbeddedKafkaConnect = new EmbeddedKafkaConnect(props, connectorProps, clearState)
   def apply(props: Map[String, String], connectorProps: List[Map[String, String]]): EmbeddedKafkaConnect = new EmbeddedKafkaConnect(props, connectorProps, false)
 
   // Java compatibility.
-  def apply(props: Properties, connectorProps: java.util.List[Properties], saveState: Boolean): EmbeddedKafkaConnect = new EmbeddedKafkaConnect(props.asScala.toMap, connectorProps.asScala.map(_.asScala.toMap).toList, saveState)
+  def apply(props: Properties, connectorProps: java.util.List[Properties], clearState: Boolean): EmbeddedKafkaConnect = new EmbeddedKafkaConnect(props.asScala.toMap, connectorProps.asScala.map(_.asScala.toMap).toList, clearState)
   def apply(props: Properties, connectorProps: java.util.List[Properties]): EmbeddedKafkaConnect = new EmbeddedKafkaConnect(props.asScala.toMap, connectorProps.asScala.map(_.asScala.toMap).toList, false)
 }

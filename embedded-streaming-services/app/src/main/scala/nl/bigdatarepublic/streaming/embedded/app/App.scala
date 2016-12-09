@@ -1,27 +1,23 @@
 package nl.bigdatarepublic.streaming.embedded.app
 
 import java.io.File
-import java.util.Properties
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
+import nl.bigdatarepublic.streaming.embedded.ConfigToMapImplicit._
+import nl.bigdatarepublic.streaming.embedded.LogFutureImplicit._
 import nl.bigdatarepublic.streaming.embedded.adapter.kafka.EmbeddedKafka
 import nl.bigdatarepublic.streaming.embedded.adapter.kafka.connect.EmbeddedKafkaConnect
 import nl.bigdatarepublic.streaming.embedded.adapter.kafka.registry.EmbeddedKafkaSchemaRegistry
 import nl.bigdatarepublic.streaming.embedded.adapter.redis.EmbeddedRedis
 import nl.bigdatarepublic.streaming.embedded.adapter.zookeeper.EmbeddedZookeeper
 import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
-import nl.bigdatarepublic.streaming.embedded.LogFutureImplicit._
-import nl.bigdatarepublic.streaming.embedded.ConfigToMapImplicit._
-import org.apache.kafka.common.utils.Utils
 import org.rogach.scallop.ScallopConf
-import net.ceedubs.ficus.Ficus._
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class App(services: List[EmbeddedService]) {
 
@@ -47,7 +43,7 @@ object App extends LazyLogging {
       val connect = opt[Boolean](descr = "Whether or not to start Kafka Connect (requires --registry and --connectors).")
       val registry = opt[Boolean](descr = "Whether or not to start Kafka Schema Registry.")
       val connectors = opt[List[String]](descr = "Paths to property files for Kafka Connect connectors.")
-      val persist = opt[Boolean](default = Some(false), descr = "Whether or not to persist data the services create.")
+      val persist = opt[Boolean](default = Some(false), descr = "Whether or not to persist the data the services create. If not set, data dirs are cleared out when starting.")
       dependsOnAll(kafka, List(zookeeper))
       dependsOnAll(registry, List(kafka, zookeeper))
       dependsOnAll(connectors, List(connect))
@@ -64,18 +60,18 @@ object App extends LazyLogging {
     }
 
     if (CliOpts.zookeeper.supplied) {
-      services += EmbeddedZookeeper(config.getConfig("zookeeper").toStringMap, CliOpts.persist.supplied)
+      services += EmbeddedZookeeper(config.getConfig("zookeeper").toStringMap, !CliOpts.persist.supplied)
       logger.info(s"Zookeeper option detected, adding to services to start on port (${config.getString("zookeeper.clientPort")})...")
     }
 
 
     if (CliOpts.kafka.supplied) {
-      services += EmbeddedKafka(config.getConfig("kafka").toStringMap, CliOpts.persist.supplied)
+      services += EmbeddedKafka(config.getConfig("kafka").toStringMap, !CliOpts.persist.supplied)
       logger.info(s"Kafka option detected, adding to services to start on port (${config.getString("kafka.listeners")})...")
     }
 
     if (CliOpts.registry.supplied) {
-      services += EmbeddedKafkaSchemaRegistry(config.getConfig("kafka.registry").toStringMap, CliOpts.persist.supplied)
+      services += EmbeddedKafkaSchemaRegistry(config.getConfig("kafka.registry").toStringMap)
       logger.info(s"Kafka Registry option detected, adding to services to start on port (${config.getString("kafka.registry.port")})...")
     }
 
@@ -91,7 +87,7 @@ object App extends LazyLogging {
       }
       ).map(
         connectors => {
-          services += EmbeddedKafkaConnect(config.getConfig("kafka.connect").toStringMap, connectors, CliOpts.persist.supplied)
+          services += EmbeddedKafkaConnect(config.getConfig("kafka.connect").toStringMap, connectors, !CliOpts.persist.supplied)
         }).logFailure(e => {
         logger.error("Failed to initialize Kafka Connect", e)
       }

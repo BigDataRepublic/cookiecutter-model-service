@@ -1,21 +1,21 @@
 package nl.bigdatarepublic.streaming.embedded.adapter.zookeeper
 
-import java.io.{File, IOException}
+import java.io.File
 import java.lang.reflect.Method
 import java.util.Properties
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
 import nl.bigdatarepublic.streaming.embedded.MapToPropsImplicit._
+import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
 import org.apache.commons.io.FileUtils
-import org.apache.zookeeper.server.{ServerConfig, ZooKeeperServerMain}
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig
-import scala.collection.JavaConverters._
+import org.apache.zookeeper.server.{ServerConfig, ZooKeeperServerMain}
 
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 
-class EmbeddedZookeeper(props: Map[String, String], saveState: Boolean) extends EmbeddedService with LazyLogging {
+class EmbeddedZookeeper(props: Map[String, String], clearState: Boolean) extends EmbeddedService with LazyLogging {
 
 
   val zookeeperServer = new ZooKeeperServerMain
@@ -34,6 +34,14 @@ class EmbeddedZookeeper(props: Map[String, String], saveState: Boolean) extends 
   }
 
   def start() {
+    if (clearState) {
+      logger.info("Cleaning Zookeeper data dir before start...")
+      Try(FileUtils.cleanDirectory(new File(serverConfig.getDataDir))) match {
+
+        case Success(_) => logger.info("Cleaned embedded Zookeeper data dir...")
+        case Failure(e) => logger.error("Failed to clean embedded ZooKeeper data dir...", e)
+      }
+    }
     logger.info("Starting embedded ZooKeeper...")
     zookeeperThread.start()
   }
@@ -51,25 +59,15 @@ class EmbeddedZookeeper(props: Map[String, String], saveState: Boolean) extends 
       case Failure(e) => logger.error("Failed to stop embedded ZooKeeper...", e)
     }
 
-    if (saveState) {
-      return
-    }
-
-    logger.info("Cleaning Zookeeper data dir...")
-    Try(FileUtils.cleanDirectory(new File(serverConfig.getDataDir))) match {
-
-      case Success(_) => logger.info("Cleaned embedded Zookeeper data dir...")
-      case Failure(e) => logger.error("Failed to clean embedded ZooKeeper data dir...", e)
-    }
   }
 }
 
 object EmbeddedZookeeper {
-  def apply(props: Map[String, String], saveState: Boolean): EmbeddedZookeeper = new EmbeddedZookeeper(props, saveState)
+  def apply(props: Map[String, String], clearState: Boolean): EmbeddedZookeeper = new EmbeddedZookeeper(props, clearState)
   def apply(props: Map[String, String]): EmbeddedZookeeper = new EmbeddedZookeeper(props, false)
 
   // Java compatibility.
-  def apply(props: Properties, saveState: Boolean): EmbeddedZookeeper = new EmbeddedZookeeper(props.asScala.toMap, saveState)
+  def apply(props: Properties, clearState: Boolean): EmbeddedZookeeper = new EmbeddedZookeeper(props.asScala.toMap, clearState)
   def apply(props: Properties): EmbeddedZookeeper = new EmbeddedZookeeper(props.asScala.toMap, false)
 
 }
