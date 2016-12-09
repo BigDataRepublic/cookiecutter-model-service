@@ -35,7 +35,7 @@ lazy val commonSettings = Seq(
     "Confluent.io Maven Repository" at "http://packages.confluent.io/maven"
   ),
   organization := "nl.bigdatarepublic",
-  version := "0.1.0-SNAPSHOT",
+  version := "0.1.0",
   crossPaths := false,
   scalaVersion := "2.11.8",
   libraryDependencies ++= Seq(
