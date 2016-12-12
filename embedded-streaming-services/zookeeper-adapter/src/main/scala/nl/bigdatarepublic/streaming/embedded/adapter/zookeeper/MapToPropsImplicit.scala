@@ -1,4 +1,4 @@
-package nl.bigdatarepublic.streaming.embedded
+package nl.bigdatarepublic.streaming.embedded.adapter.zookeeper
 
 import java.util.Properties
 

@@ -4,8 +4,8 @@ import java.io.File
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import nl.bigdatarepublic.streaming.embedded.ConfigToMapImplicit._
-import nl.bigdatarepublic.streaming.embedded.LogFutureImplicit._
+import ConfigToMapImplicit._
+import nl.bigdatarepublic.common.LogFutureImplicit._
 import nl.bigdatarepublic.streaming.embedded.adapter.kafka.EmbeddedKafka
 import nl.bigdatarepublic.streaming.embedded.adapter.kafka.connect.EmbeddedKafkaConnect
 import nl.bigdatarepublic.streaming.embedded.adapter.kafka.registry.EmbeddedKafkaSchemaRegistry

@@ -1,4 +1,4 @@
-package nl.bigdatarepublic.streaming.embedded
+package nl.bigdatarepublic.streaming.embedded.app
 
 import com.typesafe.config.Config
 

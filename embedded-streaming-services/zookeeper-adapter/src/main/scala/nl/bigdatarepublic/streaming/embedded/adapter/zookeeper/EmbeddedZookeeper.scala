@@ -1,17 +1,16 @@
 package nl.bigdatarepublic.streaming.embedded.adapter.zookeeper
 
-import java.io.File
 import java.lang.reflect.Method
 import java.util.Properties
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.bigdatarepublic.streaming.embedded.MapToPropsImplicit._
+import nl.bigdatarepublic.streaming.embedded.adapter.zookeeper.MapToPropsImplicit._
 import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
-import org.apache.commons.io.FileUtils
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig
 import org.apache.zookeeper.server.{ServerConfig, ZooKeeperServerMain}
 
 import scala.collection.JavaConverters._
+import scala.reflect.io.Path
 import scala.util.{Failure, Success, Try}
 
 
@@ -36,10 +35,10 @@ class EmbeddedZookeeper(props: Map[String, String], clearState: Boolean) extends
   def start() {
     if (clearState) {
       logger.info("Cleaning Zookeeper data dir before start...")
-      Try(FileUtils.cleanDirectory(new File(serverConfig.getDataDir))) match {
+      Try(Path(serverConfig.getDataDir).deleteRecursively()) match {
 
         case Success(_) => logger.info("Cleaned embedded Zookeeper data dir...")
-        case Failure(e) => logger.error("Failed to clean embedded ZooKeeper data dir...", e)
+        case Failure(e) => logger.warn("Failed to clean embedded ZooKeeper data dir...", e)
       }
     }
     logger.info("Starting embedded ZooKeeper...")

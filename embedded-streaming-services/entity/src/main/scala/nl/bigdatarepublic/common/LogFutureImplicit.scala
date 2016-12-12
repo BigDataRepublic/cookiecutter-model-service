@@ -1,4 +1,4 @@
-package nl.bigdatarepublic.streaming.embedded
+package nl.bigdatarepublic.common
 
 import scala.concurrent.{ExecutionContext, Future}
 

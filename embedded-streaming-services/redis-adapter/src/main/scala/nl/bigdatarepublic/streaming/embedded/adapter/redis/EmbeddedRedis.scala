@@ -4,8 +4,9 @@ import java.util.Properties
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
-import scala.collection.JavaConverters._
 import redis.embedded.RedisServer
+
+import scala.collection.JavaConverters._
 
 /**
   * Encapsulates Redis.

@@ -1,12 +1,10 @@
 package nl.bigdatarepublic.streaming.embedded.adapter.kafka.connect
 
-import java.io.File
 import java.util.Properties
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.bigdatarepublic.streaming.embedded.LogFutureImplicit._
+import nl.bigdatarepublic.common.LogFutureImplicit._
 import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
-import org.apache.commons.io.FileUtils
 import org.apache.kafka.connect.runtime.rest.RestServer
 import org.apache.kafka.connect.runtime.rest.entities.ConnectorInfo
 import org.apache.kafka.connect.runtime.standalone.{StandaloneConfig, StandaloneHerder}
@@ -18,6 +16,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future, Promise}
+import scala.reflect.io.Path
 import scala.util.{Failure, Success, Try}
 
 
@@ -49,10 +48,10 @@ class EmbeddedKafkaConnect(props: Map[String, String], connectorProps: List[Map[
       if (clearState) {
         logger.info("Cleaning Kafka Connect storage dir before start...")
         Try {
-          FileUtils.cleanDirectory(new File(props("offset.storage.file.filename")).getParentFile)
+          Path(props("offset.storage.file.filename")).parent.deleteRecursively()
         } match {
           case Success(_) => logger.info("Successfully cleaned Kafka Connect data dir.")
-          case Failure(e) => logger.error("Failed to clean Kafka Connect data dir.")
+          case Failure(e) => logger.warn("Failed to clean Kafka Connect data dir.", e)
         }
       }
       connect.start()
@@ -73,9 +72,6 @@ class EmbeddedKafkaConnect(props: Map[String, String], connectorProps: List[Map[
       }}.logSuccess { _ => {
         logger.info("All connectors were successfully added.")
       }}
-//      }} recover {
-//        case _ => connect.stop()
-//      }
 
 
       Await.ready(future, Duration.Inf)

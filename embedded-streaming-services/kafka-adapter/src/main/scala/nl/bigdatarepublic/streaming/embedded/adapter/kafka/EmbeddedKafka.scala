@@ -1,15 +1,13 @@
 package nl.bigdatarepublic.streaming.embedded.adapter.kafka
 
-
-import java.io.File
 import java.util.Properties
 
 import com.typesafe.scalalogging.LazyLogging
 import kafka.server.{KafkaConfig, KafkaServerStartable}
 import nl.bigdatarepublic.streaming.embedded.entity.EmbeddedService
-import org.apache.commons.io.FileUtils
 
 import scala.collection.JavaConverters._
+import scala.reflect.io.Path
 import scala.util.{Failure, Success, Try}
 
 
@@ -22,9 +20,10 @@ class EmbeddedKafka(props: Map[String, String], clearState: Boolean) extends Laz
     if (clearState) {
       logger.info("Cleaning Kafka data dir before start...")
       kafka.serverConfig.logDirs.foreach { x =>
-        Try(FileUtils.cleanDirectory(new File(x))) match {
-          case Success(prop) => logger.info("Successfully cleaned Kafka data dir...")
-          case Failure(e) => logger.error("Failed to clean Kafka data dir", e)
+        Try(Path(x).deleteRecursively()) match {
+          case Success(true) => logger.info("Successfully cleaned Kafka data dir...")
+          case Success(false) => logger.info("Failed to clean Kafka data dir...")
+          case Failure(e) => logger.warn("Failed to clean Kafka data dir", e)
         }
       }
     }
