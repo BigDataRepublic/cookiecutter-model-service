@@ -44,6 +44,12 @@ lazy val commonSettings = Seq(
     logbackTest
 
   ),
+  assemblyMergeStrategy in assembly := {
+    case PathList("javax", "inject", xs @ _*)         => MergeStrategy.first
+    case x =>
+      val oldStrategy = (assemblyMergeStrategy in assembly).value
+      oldStrategy(x)
+  },
   bintrayReleaseOnPublish in ThisBuild := false,
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   publishMavenStyle := true,
@@ -113,11 +119,5 @@ lazy val embeddedStreamingServicesApp = Project(id = "app", base = file("app")).
       slf4jOverlog4j // Zookeeper logging should be captured by sl4fj
     ),
     mainClass in assembly := Some("nl.bigdatarepublic.streaming.embedded.app.App"),
-    assemblyMergeStrategy in assembly := {
-      case PathList("javax", "inject", xs @ _*)         => MergeStrategy.first
-      case x =>
-        val oldStrategy = (assemblyMergeStrategy in assembly).value
-        oldStrategy(x)
-    },
     publish := { } // Do not publish to bintray.
   ).dependsOn(embeddedStreamingEntity, embeddedStreamingKafkaAdapter, embeddedStreamingRedisAdapter, embeddedStreamingZookeeperAdapter)
