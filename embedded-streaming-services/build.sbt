@@ -2,6 +2,7 @@ import sbt._
 import sbt.Keys._
 
 publish := { } // Do not try to publish root project to bintray.
+bintrayRelease := { } // Do not publish root project to bintray.
 
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 val scalaMockTest = "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % "test"
@@ -119,5 +120,6 @@ lazy val embeddedStreamingServicesApp = Project(id = "app", base = file("app")).
       slf4jOverlog4j // Zookeeper logging should be captured by sl4fj
     ),
     mainClass in assembly := Some("nl.bigdatarepublic.streaming.embedded.app.App"),
-    publish := { } // Do not publish to bintray.
+    publish := { }, // Do not publish to bintray.
+    bintrayRelease := { } // Do not publish to bintray.
   ).dependsOn(embeddedStreamingEntity, embeddedStreamingKafkaAdapter, embeddedStreamingRedisAdapter, embeddedStreamingZookeeperAdapter)
