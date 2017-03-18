@@ -7,5 +7,5 @@ dependencies:
   - numpy
   - pandas
   - scipy
-  - git+https://github.com/BigDataRepublic/bdr-engineering-stack.git@Feature/model_docker#subdirectory=data-science-production-container/ds_prod_api
-
+  - 
+git+https://github.com/BigDataRepublic/bdr-engineering-stack.git@develop#subdirectory=data-science-production-container/ds_prod_api
