@@ -1,6 +1,7 @@
 name: ds_prod
 dependencies:
 - flask
+- python=3
 - pip:
   - sklearn
   - dill
