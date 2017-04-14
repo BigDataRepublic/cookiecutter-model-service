@@ -15,7 +15,8 @@ sys.path.append(path)
 class BaselineLmModel(Model):
     def load(self):
         print("Loading baseline model")
-        self.estimator = pickle.load(open(path + '/../models/lm.p', "rb"), encoding="UTF-8")
+        self.estimator = pickle.load(open(path + '/models/lm.p', "rb"), encoding="UTF-8")
+
 
     def predict(self, feature_vector):
         print("Received predict in model with feature vector")
@@ -28,7 +29,6 @@ class BaselineLmModel(Model):
 
 class BaselineFeatureExtractor(FeatureExtractor):
     def get_features(self, json_features_dict):
-        try:
         print("Getting features for")
         print(json_features_dict)
 
@@ -39,6 +39,7 @@ model = BaselineLmModel()
 extractor = BaselineFeatureExtractor()
 
 model.load()
+
 print("creating api")
 api = FlaskApi(model, extractor)
 api.run()
