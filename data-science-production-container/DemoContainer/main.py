@@ -32,7 +32,7 @@ class BaselineFeatureExtractor(FeatureExtractor):
         print("Getting features for")
         print(json_features_dict)
 
-        return df.from_dict([json_features_dict])
+        return df.from_dict(json_features_dict)
 
 
 model = BaselineLmModel()

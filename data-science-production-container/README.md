@@ -61,14 +61,16 @@ Add the dependencies of your project to the `environment.yaml` file. This file w
 ```
 name: ds_prod
 dependencies:
-- flask
+- flask=0.12.2
+- python=3
+- numpy=1.13.1
+- scikit-learn=0.18.1
+- dill=0.2.6
+- pandas=0.20.3
+- scipy=0.19.1
+
 - pip:
-  - sklearn
-  - dill
-  - numpy
-  - pandas
-  - scipy
-  - git+https://github.com/BigDataRepublic/bdr-engineering-stack.git@Feature/model_docker#subdirectory=data-science-production-container/ds_prod_api
+  - git+https://github.com/BigDataRepublic/bdr-engineering-stack.git@develop#subdirectory=data-science-production-container/ds_prod_api
 ```
 
 #### Step 6
@@ -90,7 +92,7 @@ docker run -p5000:5000 MyFirstDSProdContainer
 
 
 #### Step 8
-Send a POST call to the api, and check the reponse. The model takes two feaures: `LotArea` and `YearBuilt`.
+Send a POST call to the api, and check the reponse. The model takes two features: `LotArea` and `YearBuilt`.
 
 
 ```
@@ -100,6 +102,15 @@ curl \
     -d '[{"LotArea": 200,"YearBuilt":1978}]' \
     http://localhost:5000/predict
 ```
+
+You can also create your own data json, if you put a features.json file with `[{"LotArea": 200,"YearBuilt":1978}]` in the same directory, run:
+
+```
+curl \
+    -H "Content-Type: application/json" \
+    -X POST \
+    -d @features.json \
+    http://localhost:5000/predict
 
 Alternatively, you can use a GUI like [postman](https://www.getpostman.com/).
 
