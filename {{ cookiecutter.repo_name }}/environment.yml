@@ -10,7 +10,6 @@ dependencies:
 - flake8
 - click
 - flask=0.12.2
-- python=3
 - numpy=1.13.1
 - scikit-learn=0.18.1
 - dill=0.2.6
