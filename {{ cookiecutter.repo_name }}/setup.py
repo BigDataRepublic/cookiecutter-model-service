@@ -13,6 +13,8 @@ setup(
     python_requires='>3.5',
 {% endif %}
     install_requires=[
+                     "click",
+                     "python-dotenv>=0.5.1",
                      "flask=0.12.2",
                      "python=3",
                      "numpy=1.13.1",
