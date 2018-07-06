@@ -1,3 +1,30 @@
+# Data Science Production Container tutorial
+
+
+### Requirements to use the cookiecutter template:
+ - Python 2.7 or 3.5
+ - [Cookiecutter Python package](http://cookiecutter.readthedocs.org/en/latest/installation.html) >= 1.4.0: This can be installed with pip by or conda depending on how you manage your Python packages:
+
+``` bash
+$ pip install cookiecutter
+```
+
+or
+
+``` bash
+$ conda config --add channels conda-forge
+$ conda install cookiecutter
+```
+
+
+### To start a new project, run:
+
+    cookiecutter https://github.com/BigDataRepublic/cookiecutter-model-service
+    
+    
+Then from within your new project dir you can create a new environment with the same name using:
+
+    conda env create -f environment.yml
 
 # Data Science Production Container tutorial
 This tutorial will help you get started on using the data science production container. Firstly an explanation of the framework and it's components will be done. Secondly a hands-on exercise to get a predictive model into a running docker container.
