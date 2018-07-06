@@ -42,37 +42,17 @@ def test_license(default_baked_project):
 
 
 def test_requirements(default_baked_project):
-    reqs_path = default_baked_project / 'requirements.txt'
+    reqs_path = default_baked_project / 'environment.yml'
 
     assert reqs_path.exists()
     assert no_curlies(reqs_path)
 
 
-def test_makefile(default_baked_project):
-    makefile_path = default_baked_project / 'Makefile'
-
-    assert makefile_path.exists()
-    assert no_curlies(makefile_path)
-
-
 def test_folders(default_baked_project):
     expected_dirs = [
-        'data',
-        'data/external',
-        'data/interim',
-        'data/processed',
-        'data/raw',
-        'docs',
+        'doc',
         'models',
-        'notebooks',
-        'references',
-        'reports',
-        'reports/figures',
         'project_name',
-        'project_name/data',
-        'project_name/features',
-        'project_name/models',
-        'project_name/visualization',
     ]
 
     ignored_dirs = [
