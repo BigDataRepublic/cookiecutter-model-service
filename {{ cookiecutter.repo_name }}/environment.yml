@@ -1,0 +1,26 @@
+name: {{ cookiecutter.repo_name }}
+dependencies:
+{% if cookiecutter.python_interpreter == 'python3' %}
+- python=3.6
+{% else %}
+- python=2.7
+{% endif %}
+- pytest
+- coverage
+- flake8
+- click
+- flask=0.12.2
+- numpy=1.13.1
+- scikit-learn=0.18.1
+- dill=0.2.6
+- pandas=0.20.3
+- scipy=0.19.1
+- pip
+- pip:
+  - pytest-runner
+  - python-dotenv>=0.5.1
+  - git+https://github.com/BigDataRepublic/bdr-engineering-stack.git@develop#subdirectory=data-science-production-container/ds_prod_api
+{% if cookiecutter.python_interpreter != 'python3' %}
+# backwards compatibility
+  - pathlib2
+{% endif %}

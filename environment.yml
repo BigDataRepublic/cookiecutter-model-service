@@ -1,0 +1,6 @@
+name: cookiecutter_model_service
+dependencies:
+- python=3.6
+- pip
+- pip:
+  - -rrequirements.txt
