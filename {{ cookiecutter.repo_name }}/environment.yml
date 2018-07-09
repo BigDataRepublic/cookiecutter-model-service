@@ -19,7 +19,7 @@ dependencies:
 - pip:
   - pytest-runner
   - python-dotenv>=0.5.1
-  - git+https://github.com/BigDataRepublic/bdr-engineering-stack.git@develop#subdirectory=data-science-production-container/ds_prod_api
+  - git+https://github.com/BigDataRepublic/ds-prod-api.git#egg=ds_prod_api-0.0.1
 {% if cookiecutter.python_interpreter != 'python3' %}
 # backwards compatibility
   - pathlib2
