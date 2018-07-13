@@ -52,7 +52,7 @@ def test_folders(default_baked_project):
     expected_dirs = [
         'doc',
         'models',
-        'project_name',
+        'projectname',
     ]
 
     ignored_dirs = [

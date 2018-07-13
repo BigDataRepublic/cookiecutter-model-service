@@ -28,7 +28,7 @@ setup(
     ],
     include_package_data=True,
     package_data={
-                  '{{ cookiecutter.repo_name }}': ['models/*.*'],
+                  '{{ cookiecutter.package_name }}': ['models/*.*'],
                  },
     setup_requires=["pytest-runner"],
     tests_require=["pytest"]

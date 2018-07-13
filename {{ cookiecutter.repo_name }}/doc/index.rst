@@ -8,4 +8,4 @@ Contents
 .. toctree::
    :maxdepth: 1
 
-   source/{{ cookiecutter.repo_name }}
+   source/{{ cookiecutter.package_name }}
